@@ -1,0 +1,6 @@
+# Compiled source
+*.pyc
+
+# OS/IDE generated files
+.DS_Store
+.idea
