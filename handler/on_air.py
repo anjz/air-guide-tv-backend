@@ -1,4 +1,4 @@
-from handlers.base.public_handler import PublicHandler
+from handler.base.public_handler import PublicHandler
 
 
 class OnAirHandler(PublicHandler):

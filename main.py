@@ -2,7 +2,7 @@ import os
 import webapp2
 from google.appengine.ext import vendor
 
-from handlers.on_air import OnAirHandler
+from handler.on_air import OnAirHandler
 
 vendor.add(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
 debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
