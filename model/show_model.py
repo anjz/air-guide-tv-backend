@@ -2,6 +2,9 @@ from google.appengine.ext import ndb
 
 
 class ShowModel(ndb.Model):
+    """
+    Ndb model holding tv show information
+    """
     country_code = ndb.StringProperty(name='cc')
     channel_id = ndb.StringProperty(name='ci')
     show_id = ndb.StringProperty(name='sid')
