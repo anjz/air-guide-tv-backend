@@ -11,6 +11,10 @@ handlers:
 
 - url: .*
   script: main.app
+  
+- url: /cron/scrap/elpais
+  script: main.app
+  login: admin
 
 libraries:
 - name: webapp2
