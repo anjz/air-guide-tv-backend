@@ -32,10 +32,12 @@ class ElPaisScraper:
             import logging
             logging.error('Couldn\'t retrieve shows info from: ' + shows_file_url)
             logging.error('Error code: ', e.code)
+            return
         except urllib2.URLError as e:
             import logging
             logging.error('Failed reaching server: ' + shows_file_url)
             logging.error('Reason: ' + e.reason)
+            return
         else:
             channels_list = json.loads(shows_response, 'utf-8')
 
@@ -45,14 +47,16 @@ class ElPaisScraper:
                     channel_id=channel['idCanal']
                 )
                 for show in channel['programas']:
-                    # Dates in the json document are Madrid dates
-                    start_time = arrow.get(show['iniDate']).replace(tzinfo='Europe/Madrid')
-                    end_time = arrow.get(show['endDate']).replace(tzinfo='Europe/Madrid')
+                    # Dates in the json document are Madrid dates.
+                    # After replacing timezone by Europe/Madrid the date is converted to UTC.
+                    # naive property returns a Python datetime.datetime object without tzinfo (ideal for ndb lib)
+                    start_time = arrow.get(show['iniDate']).replace(tzinfo='Europe/Madrid').to('utc').naive
+                    end_time = arrow.get(show['endDate']).replace(tzinfo='Europe/Madrid').to('utc').naive
 
                     show_model.show_id = show['id_programa']
-                    show_model.start_time = start_time.datetime
-                    show_model.end_time = end_time.datetime
+                    show_model.start_time = start_time
+                    show_model.end_time = end_time
                     show_model.show_name = show['title']
-                    show_model.show_info = show['description']
+                    show_model.show_description = show['description']
 
                     yield show_model
