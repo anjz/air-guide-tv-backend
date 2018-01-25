@@ -1,0 +1,4 @@
+cron:
+- description: daily scraping for El Pais
+  url: /cron/scrap/elpais
+  schedule: every day 00:00
