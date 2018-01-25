@@ -8,4 +8,4 @@ class ShowModel(ndb.Model):
     start_time = ndb.DateTimeProperty(name='st')
     end_time = ndb.DateTimeProperty(name='et')
     show_name = ndb.StringProperty(name='sn', indexed=False)
-    show_info = ndb.StringProperty(name='si', indexed=False)
+    show_description = ndb.StringProperty(name='de', indexed=False)
