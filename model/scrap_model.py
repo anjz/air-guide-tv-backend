@@ -21,7 +21,7 @@ class ScrapModel(ndb.Model):
         return self.amount_dates_scraped == self.amount_dates_to_scrap
 
     @classmethod
-    def generate_id_for_new_model(cls, date=None):
+    def generate_id_for_new_entity(cls, date=None):
         """
         Generate an entity id based on date.
 
