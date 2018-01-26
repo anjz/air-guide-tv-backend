@@ -1,4 +1,3 @@
-application: air-guide-tv
 version: 1
 runtime: python27
 api_version: 1
@@ -11,7 +10,7 @@ handlers:
 
 - url: .*
   script: main.app
-  
+
 - url: /cron/scrap/elpais
   script: main.app
   login: admin
