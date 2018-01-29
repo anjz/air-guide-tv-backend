@@ -14,10 +14,11 @@ class ElPaisScraper:
 
     def get_shows_for_date(self, date):
         """
-        A generator function for retrieving all the information about the tv shows in the given date.
+        A list of tv shows in the given date.
+
         :param Arrow date: Arrow object for the desired date.
-        :return: A generator function for iterating through show models.
-        :rtype: Generator[ShowModel]
+        :return: A list of show models.
+        :rtype: list[ShowModel]
         """
         two_digits_day = '{:02d}'.format(date.day)
         two_digits_month = '{:02d}'.format(date.month)
@@ -39,14 +40,14 @@ class ElPaisScraper:
             logging.error('Reason: ' + e.reason)
             return
         else:
+            show_list = []
             channels_list = json.loads(shows_response, 'utf-8')
 
             for channel in channels_list:
-                show_model = ShowModel(
-                    country_code=self.__COUNTRY,
-                    channel_id=channel['idCanal']
-                )
                 for show in channel['programas']:
+                    show_model = ShowModel()
+                    show_model.country_code = self.__COUNTRY
+                    show_model.channel_id = channel['idCanal']
                     # Dates in the json document are Madrid dates.
                     # After replacing timezone by Europe/Madrid the date is converted to UTC.
                     # naive property returns a Python datetime.datetime object without tzinfo (ideal for ndb lib)
@@ -59,4 +60,6 @@ class ElPaisScraper:
                     show_model.show_name = show['title']
                     show_model.show_description = show['description']
 
-                    yield show_model
+                    show_list.append(show_model)
+
+            return show_list
