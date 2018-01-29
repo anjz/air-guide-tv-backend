@@ -32,15 +32,10 @@ class ScrapingService:
             self._scrap_and_store_shows(date, scrap_entity_key)
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
-        shows_to_persist = []
-        current_batch_size = 0
-        for show in self.__scraper.get_shows_for_date(date):
-            if current_batch_size < self.__MAX_STORE_BATCH_SIZE:
-                show.parent = scrap_info_entity_key
-                shows_to_persist.append(show)
-                current_batch_size += 1
-            else:
-                # Store current batch
-                ndb.put_multi(shows_to_persist)
-                shows_to_persist = []
-                current_batch_size = 0
+        shows = self.__scraper.get_shows_for_date(date)
+        for show in shows:
+            show.parent = scrap_info_entity_key
+
+        for show_index in range(0, len(shows), self.__MAX_STORE_BATCH_SIZE):
+            shows_to_persist = shows[show_index:min(show_index + self.__MAX_STORE_BATCH_SIZE, len(shows))]
+            ndb.put_multi(shows_to_persist, use_cache=False)
