@@ -29,6 +29,7 @@ class ScrapingService:
         scrap_entity_key = scrap_entity.put()
 
         for date in args:
+            # todo use task queue
             self._scrap_and_store_shows(date, scrap_entity_key)
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
@@ -39,3 +40,5 @@ class ScrapingService:
         for show_index in range(0, len(shows), self.__MAX_STORE_BATCH_SIZE):
             shows_to_persist = shows[show_index:min(show_index + self.__MAX_STORE_BATCH_SIZE, len(shows))]
             ndb.put_multi(shows_to_persist, use_cache=False)
+
+        # todo update scrap_info_entity in a transaction. Increment the amount_dates_scrapped
