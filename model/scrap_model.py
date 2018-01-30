@@ -7,7 +7,7 @@ class ScrapModel(ndb.Model):
     Entities using this model are used as parent entities of the ones containing show information.
     """
     scrap_date_time = ndb.DateTimeProperty(name='sdt')
-    country = ndb.StringProperty(name='co')
+    timezone = ndb.StringProperty(name='tz')
     amount_dates_to_scrap = ndb.IntegerProperty(name='adts', indexed=False)
     amount_dates_scraped = ndb.IntegerProperty(name='ads', indexed=False)
 
@@ -22,10 +22,11 @@ class ScrapModel(ndb.Model):
         return self.amount_dates_scraped == self.amount_dates_to_scrap
 
     @classmethod
-    def generate_id_for_new_entity(cls, date=None):
+    def generate_id_for_new_entity(cls, timezone, date=None):
         """
         Generate an entity id based on date.
 
+        :param str timezone: timezone code of the scraper
         :param datetime.datetime|Arrow|None date: A date used to generate an id. UTC now used if date not supplied.
         :return: A string that can be used as id for an entity based on this model
         """
@@ -33,4 +34,4 @@ class ScrapModel(ndb.Model):
             import arrow
             date = arrow.utcnow()
 
-        return '{}-{}-{}'.format(date.day, date.month, date.year)
+        return '{}-{}-{}-{}'.format(timezone, date.day, date.month, date.year)

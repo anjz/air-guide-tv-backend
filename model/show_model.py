@@ -5,7 +5,7 @@ class ShowModel(ndb.Model):
     """
     Ndb model holding tv show information
     """
-    country_code = ndb.StringProperty(name='cc')
+    timezone = ndb.StringProperty(name='tz')
     channel_id = ndb.StringProperty(name='ci')
     show_id = ndb.StringProperty(name='sid')
     start_time = ndb.DateTimeProperty(name='st')

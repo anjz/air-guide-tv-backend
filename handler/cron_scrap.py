@@ -18,7 +18,7 @@ class CronScrapHandler(webapp2.RequestHandler):
         scraping_service = ScrapingService(el_pais_scraper)
 
         import arrow
-        today = arrow.now('Europe/Madrid')
+        today = arrow.now(ElPaisScraper.TIME_ZONE)
         tomorrow = today.shift(days=1)
         after_tomorrow = tomorrow.shift(days=1)
 

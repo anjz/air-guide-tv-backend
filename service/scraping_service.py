@@ -10,7 +10,7 @@ class ScrapingService:
         self.__scraper = scraper
 
     def scrap_and_store_shows_for_dates(self, *args):
-        scrap_entity_id = ScrapModel.generate_id_for_new_entity()
+        scrap_entity_id = ScrapModel.generate_id_for_new_entity(self.__scraper.TIME_ZONE)
         scrap_entity = ScrapModel.get_by_id(scrap_entity_id)
 
         if scrap_entity is not None:
@@ -21,6 +21,7 @@ class ScrapingService:
         import arrow
         scrap_entity = ScrapModel(
             id=scrap_entity_id,
+            timezone=self.__scraper.TIME_ZONE,
             scrap_date_time=arrow.utcnow().naive,
             amount_dates_to_scrap=len(args),
             amount_dates_scraped=0
@@ -33,9 +34,7 @@ class ScrapingService:
             self._scrap_and_store_shows(date, scrap_entity_key)
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
-        shows = self.__scraper.get_shows_for_date(date)
-        for show in shows:
-            show.parent = scrap_info_entity_key
+        shows = self.__scraper.get_shows_for_date(date, parent=scrap_info_entity_key)
 
         for show_index in range(0, len(shows), self.__MAX_STORE_BATCH_SIZE):
             shows_to_persist = shows[show_index:min(show_index + self.__MAX_STORE_BATCH_SIZE, len(shows))]

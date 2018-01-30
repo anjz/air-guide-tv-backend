@@ -10,9 +10,10 @@ class ElPaisScraper:
     __BASE_URL = 'https://programacion-tv.elpais.com/data/'
     __FILE_NAME_FORMAT = 'parrilla_{}{}{}.json'
     __DESCRIPTIONS_FILE_NAME_FORMAT = 'programas/{}.json'
-    __COUNTRY = 'es'
 
-    def get_shows_for_date(self, date):
+    TIME_ZONE = 'Europe/Madrid'
+
+    def get_shows_for_date(self, date, parent=None):
         """
         A list of tv shows in the given date.
 
@@ -45,8 +46,8 @@ class ElPaisScraper:
 
             for channel in channels_list:
                 for show in channel['programas']:
-                    show_model = ShowModel()
-                    show_model.country_code = self.__COUNTRY
+                    show_model = ShowModel(parent=parent)
+                    show_model.timezone = self.TIME_ZONE
                     show_model.channel_id = channel['idCanal']
                     # Dates in the json document are Madrid dates.
                     # After replacing timezone by Europe/Madrid the date is converted to UTC.
