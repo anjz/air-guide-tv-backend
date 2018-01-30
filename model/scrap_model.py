@@ -7,8 +7,9 @@ class ScrapModel(ndb.Model):
     Entities using this model are used as parent entities of the ones containing show information.
     """
     scrap_date_time = ndb.DateTimeProperty(name='sdt')
-    amount_dates_to_scrap = ndb.IntegerProperty(name='adts')
-    amount_dates_scraped = ndb.IntegerProperty(name='ads')
+    country = ndb.StringProperty(name='co')
+    amount_dates_to_scrap = ndb.IntegerProperty(name='adts', indexed=False)
+    amount_dates_scraped = ndb.IntegerProperty(name='ads', indexed=False)
 
     def is_scrap_complete(self):
         """
