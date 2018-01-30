@@ -11,4 +11,4 @@ class OnAirHandler(PublicHandler):
             shows = ShowsService.retrieve_on_air_shows_for_country('Europe/Madrid')
 
             # todo format response correctly
-            self.response.write(json.dumps([show.show_name for show in shows]))
+            self.response.write(json.dumps([show['show_name'] for show in shows]))

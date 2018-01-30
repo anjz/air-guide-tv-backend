@@ -22,10 +22,7 @@ class CronScrapHandler(webapp2.RequestHandler):
         tomorrow = today.shift(days=1)
         after_tomorrow = tomorrow.shift(days=1)
 
+        logging.info('El Pais tv shows information scraping started')
         scraping_service.scrap_and_store_shows_for_dates(today, tomorrow, after_tomorrow)
 
-        logging.info('El Pais tv shows information stored')
-
-        self.response.write('done')
-
-
+        self.response.status = 204

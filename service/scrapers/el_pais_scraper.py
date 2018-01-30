@@ -17,7 +17,8 @@ class ElPaisScraper:
         """
         A list of tv shows in the given date.
 
-        :param Arrow date: Arrow object for the desired date.
+        :param ndb.Key parent: Entity key to be used as parent for the generated show entities
+        :param datetime.datetime date: Arrow object for the desired date.
         :return: A list of show models.
         :rtype: list[ShowModel]
         """
