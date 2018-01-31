@@ -21,9 +21,8 @@ class ScrapingService:
             delete_keys = ShowModel.query(ancestor=scrap_entity.key).fetch(keys_only=True)
             delete_keys.append(scrap_entity.key)
 
-            for entity_index in range(0, len(delete_keys), self.__MAX_BATCH_SIZE):
-                delete_batch = delete_keys[entity_index:min(entity_index + self.__MAX_BATCH_SIZE, len(delete_keys))]
-                ndb.delete_multi(delete_batch)
+            for batch in self._get_list_in_batches(delete_keys, self.__MAX_BATCH_SIZE):
+                ndb.delete_multi(batch)
 
         import arrow
         scrap_entity = ScrapModel(
@@ -44,11 +43,15 @@ class ScrapingService:
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
         shows = self.__scraper.get_shows_for_date(date, parent=scrap_info_entity_key)
 
-        for show_index in range(0, len(shows), self.__MAX_BATCH_SIZE):
-            shows_to_persist = shows[show_index:min(show_index + self.__MAX_BATCH_SIZE, len(shows))]
-            ndb.put_multi(shows_to_persist, use_cache=False)
+        for batch in self._get_list_in_batches(shows, self.__MAX_BATCH_SIZE):
+            ndb.put_multi(batch, use_cache=False)
 
         # todo update scrap_info_entity in a transaction. Increment the amount_dates_scrapped
 
         # todo if this is the last date to be scrapped, defer a task for deleting show entities that are child of scraping
         # info model older than 3 days
+
+    @classmethod
+    def _get_list_in_batches(cls, full_list, batch_size):
+        for item_index in range(0, len(full_list), batch_size):
+            yield full_list[item_index:min(item_index + batch_size, len(full_list))]
