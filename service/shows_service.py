@@ -42,7 +42,7 @@ class ShowsService:
     def _get_most_recent_scrap_entity(cls, timezone):
         # Check if there is scrapping information from today.
         scrap_entity = ScrapModel.get_by_id(ScrapModel.generate_id_for_new_entity(timezone))
-        if scrap_entity:
+        if scrap_entity and scrap_entity.is_scrap_complete():
             return scrap_entity
 
         # No luck. Try to get yesterday's scrap model
@@ -50,14 +50,14 @@ class ShowsService:
         yesterday_date = arrow.utcnow().shift(days=-1)
         scrap_entity = ScrapModel.get_by_id(ScrapModel.generate_id_for_new_entity(timezone, yesterday_date))
 
-        if scrap_entity:
+        if scrap_entity and scrap_entity.is_scrap_complete():
             return scrap_entity
 
         # No luck. Try to get before yesterday's scrap model
         before_yesterday_date = yesterday_date.shift(days=-1)
         scrap_entity = ScrapModel.get_by_id(ScrapModel.generate_id_for_new_entity(timezone, before_yesterday_date))
 
-        if scrap_entity:
+        if scrap_entity and scrap_entity.is_scrap_complete():
             return scrap_entity
 
         # todo replace generic exception by a custom exception
