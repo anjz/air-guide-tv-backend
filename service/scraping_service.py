@@ -17,12 +17,7 @@ class ScrapingService:
 
         if scrap_entity is not None:
             # Scraping data for today already exists. Delete it.
-            logging.info('Deleting existing scrap info for today')
-            delete_keys = ShowModel.query(ancestor=scrap_entity.key).fetch(keys_only=True)
-            delete_keys.append(scrap_entity.key)
-
-            for batch in self._get_list_in_batches(delete_keys, self.__MAX_BATCH_SIZE):
-                ndb.delete_multi(batch)
+            self._delete_scrap_info(scrap_entity.key)
 
         import arrow
         scrap_entity = ScrapModel(
@@ -46,12 +41,35 @@ class ScrapingService:
         for batch in self._get_list_in_batches(shows, self.__MAX_BATCH_SIZE):
             ndb.put_multi(batch, use_cache=False)
 
-        # todo update scrap_info_entity in a transaction. Increment the amount_dates_scrapped
+        self._increment_amount_dates_scraped(scrap_info_entity_key)
 
-        # todo if this is the last date to be scrapped, defer a task for deleting show entities that are child of scraping
-        # info model older than 3 days
-
-    @classmethod
-    def _get_list_in_batches(cls, full_list, batch_size):
+    def _get_list_in_batches(self, full_list, batch_size):
         for item_index in range(0, len(full_list), batch_size):
             yield full_list[item_index:min(item_index + batch_size, len(full_list))]
+
+    def _delete_scrap_info(self, scrap_parent_entity_key):
+        logging.info('Deleting old shows information')
+        delete_keys = ShowModel.query(ancestor=scrap_parent_entity_key).fetch(keys_only=True)
+        delete_keys.append(scrap_parent_entity_key)
+
+        for batch in self._get_list_in_batches(delete_keys, self.__MAX_BATCH_SIZE):
+            ndb.delete_multi(batch)
+
+    @ndb.transactional()
+    def _increment_amount_dates_scraped(self, scrap_info_entity_key):
+        scrap_info_entity = scrap_info_entity_key.get()
+        scrap_info_entity.amount_dates_scraped += 1
+        scrap_info_entity.put()
+
+        if scrap_info_entity.amount_dates_scraped == scrap_info_entity.amount_dates_to_scrap:
+            logging.info('Scraping Complete')
+            from google.appengine.ext.deferred import deferred
+            deferred.defer(self._cleanup_old_shows_info, scrap_info_entity.scrap_date_time)
+
+    def _cleanup_old_shows_info(self, latest_datetime):
+        logging.info('Cleaning show info scrapped before than: {}'.format(latest_datetime))
+        old_scrap_info_entities = ScrapModel.query(ScrapModel.scrap_date_time < latest_datetime).fetch()
+
+        for old_entity in old_scrap_info_entities:
+            from google.appengine.ext.deferred import deferred
+            deferred.defer(self._delete_scrap_info, old_entity.key)
