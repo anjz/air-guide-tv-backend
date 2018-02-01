@@ -4,7 +4,6 @@ from google.appengine.ext import ndb
 from model.scrap_model import ScrapModel
 from model.show_model import ShowModel
 
-
 class ScrapingService:
     __MAX_BATCH_SIZE = 500
 
@@ -36,6 +35,7 @@ class ScrapingService:
             deferred.defer(self._scrap_and_store_shows, date.naive, scrap_entity_key)
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
+        logging.info('Scraping date: {}'.format(date.isoformat()))
         shows = self.__scraper.get_shows_for_date(date, parent=scrap_info_entity_key)
 
         for batch in self._get_list_in_batches(shows, self.__MAX_BATCH_SIZE):
