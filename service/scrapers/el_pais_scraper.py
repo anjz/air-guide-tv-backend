@@ -45,7 +45,7 @@ class ElPaisScraper:
         else:
             show_list = []
 
-            # Remove bad escape sequences: \\, \/, \", \b, \r, \n, \f and \t
+            # Remove bad escape sequences. Only valid ones are: \\, \/, \", \b, \r, \n, \f and \t
             # also one 4-character escape sequence to define any Unicode codepoint, \uhhhh (\u plus 4 hex digits)'
             shows_response = re.sub(r'(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'', shows_response)
             channels_list = json.loads(shows_response, 'utf-8')
