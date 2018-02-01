@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 from model.scrap_model import ScrapModel
 from model.show_model import ShowModel
 
+
 class ScrapingService:
     __MAX_BATCH_SIZE = 500
 
@@ -13,26 +14,13 @@ class ScrapingService:
     def scrap_and_store_shows_for_dates(self, *args):
         scrap_entity_id = ScrapModel.generate_id_for_new_entity(self.__scraper.TIME_ZONE)
         scrap_entity = ScrapModel.get_by_id(scrap_entity_id)
+        from google.appengine.ext.deferred import deferred
 
         if scrap_entity is not None:
-            # Scraping data for today already exists. Delete it.
-            self._delete_scrap_info(scrap_entity.key)
-
-        import arrow
-        scrap_entity = ScrapModel(
-            id=scrap_entity_id,
-            timezone=self.__scraper.TIME_ZONE,
-            scrap_date_time=arrow.utcnow().naive,
-            amount_dates_to_scrap=len(args),
-            amount_dates_scraped=0
-        )
-
-        scrap_entity_key = scrap_entity.put()
-
-        for date in args:
-            logging.info('Deferring scraping. Date: {}. Timezone: {}'.format(date.humanize(), self.__scraper.TIME_ZONE))
-            from google.appengine.ext.deferred import deferred
-            deferred.defer(self._scrap_and_store_shows, date.naive, scrap_entity_key)
+            # Scraping data for today already exists. Delete it and get new
+            deferred.defer(self._replace_today_scrap, scrap_entity.key, args)
+        else:
+            self._scrap_and_store(scrap_entity_id, args)
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
         logging.info('Scraping date: {}'.format(date.isoformat()))
@@ -73,3 +61,27 @@ class ScrapingService:
         for old_entity in old_scrap_info_entities:
             from google.appengine.ext.deferred import deferred
             deferred.defer(self._delete_scrap_info, old_entity.key)
+
+    def _replace_today_scrap(self, scrap_entity_key, dates):
+        # delete existing scraped data
+        self._delete_scrap_info(scrap_entity_key)
+
+        # scrap new data
+        self._scrap_and_store(scrap_entity_key.id, dates)
+
+    def _scrap_and_store(self, scrap_entity_id, dates):
+        import arrow
+        scrap_entity = ScrapModel(
+            id=scrap_entity_id,
+            timezone=self.__scraper.TIME_ZONE,
+            scrap_date_time=arrow.utcnow().naive,
+            amount_dates_to_scrap=len(dates),
+            amount_dates_scraped=0
+        )
+
+        scrap_entity_key = scrap_entity.put()
+
+        for date in dates:
+            logging.info('Deferring scraping. Date: {}. Timezone: {}'.format(date.humanize(), self.__scraper.TIME_ZONE))
+            from google.appengine.ext.deferred import deferred
+            deferred.defer(self._scrap_and_store_shows, date.naive, scrap_entity_key)
