@@ -1,4 +1,5 @@
 import json
+import re
 import urllib2
 from urllib2 import HTTPError
 
@@ -43,6 +44,10 @@ class ElPaisScraper:
             return
         else:
             show_list = []
+
+            # Remove bad escape sequences: \\, \/, \", \b, \r, \n, \f and \t
+            # also one 4-character escape sequence to define any Unicode codepoint, \uhhhh (\u plus 4 hex digits)'
+            shows_response = re.sub(r'(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'', shows_response)
             channels_list = json.loads(shows_response, 'utf-8')
 
             for channel in channels_list:
