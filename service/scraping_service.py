@@ -67,7 +67,7 @@ class ScrapingService:
         self._delete_scrap_info(scrap_entity_key)
 
         # scrap new data
-        self._scrap_and_store(scrap_entity_key.id, dates)
+        self._scrap_and_store(scrap_entity_key.id(), dates)
 
     def _scrap_and_store(self, scrap_entity_id, dates):
         import arrow
