@@ -1,7 +1,9 @@
 from google.appengine.ext import ndb
 
+from model.base_model import BaseModel
 
-class ScrapModel(ndb.Model):
+
+class ScrapModel(BaseModel):
     """
     Class with information about a specific scrap session.
     Entities using this model are used as parent entities of the ones containing show information.

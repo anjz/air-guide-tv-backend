@@ -1,7 +1,9 @@
 from google.appengine.ext import ndb
 
+from model.base_model import BaseModel
 
-class ShowModel(ndb.Model):
+
+class ShowModel(BaseModel):
     """
     Ndb model holding tv show information
     """
