@@ -10,8 +10,7 @@ class OnAirHandler(PublicHandler):
         timezone = HelperService.get_shows_info_tz_for_country(country_code)
         shows = ShowsService.retrieve_on_air_shows_for_country(timezone)
 
-        # todo format response correctly
-        self.response.write(json.dumps([show['show_name'] for show in shows]))
+        self.response.write(json.dumps(shows))
 
 
 class ChannelHandler(PublicHandler):
@@ -19,5 +18,4 @@ class ChannelHandler(PublicHandler):
         timezone = HelperService.get_shows_info_tz_for_country(country_code)
         shows = ShowsService.retrieve_shows_for_channel(channel_id, timezone)
 
-        # todo format response correctly
-        self.response.write(json.dumps([show['show_name'] for show in shows]))
+        self.response.write(json.dumps(shows))
