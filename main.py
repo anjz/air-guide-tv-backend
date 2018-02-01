@@ -2,7 +2,7 @@ import os
 import webapp2
 from google.appengine.ext import vendor
 
-from handler.on_air import OnAirHandler
+from handler.shows import OnAirHandler
 from handler.cron_scrap import CronScrapHandler
 
 vendor.add(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))

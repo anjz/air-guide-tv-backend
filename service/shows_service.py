@@ -39,6 +39,23 @@ class ShowsService:
         return current_shows_dict
 
     @classmethod
+    def retrieve_shows_for_channel(cls, channel_id, timezone):
+        memcache_key = cls._get_memcache_key_for_channel(channel_id, timezone)
+
+        cached_shows = memcache.get(memcache_key)
+        if cached_shows:
+            return cached_shows
+
+        scrap_entity = cls._get_most_recent_scrap_entity(timezone)
+
+        channel_shows = ShowModel.query(ShowModel.channel_id == channel_id, ancestor=scrap_entity.key).fetch()
+        channel_shows_dict = [show.to_dict() for show in channel_shows]
+
+        memcache.set(memcache_key, channel_shows_dict)
+
+        return channel_shows_dict
+
+    @classmethod
     def _get_most_recent_scrap_entity(cls, timezone):
         # Check if there is scrapping information from today.
         scrap_entity = ScrapModel.get_by_id(ScrapModel.generate_id_for_new_entity(timezone))
@@ -75,3 +92,7 @@ class ShowsService:
         )
 
         return memcache_key
+
+    @classmethod
+    def _get_memcache_key_for_channel(cls, channel_id, timezone):
+        return '{}-{}'.format(channel_id, timezone)

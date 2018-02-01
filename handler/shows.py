@@ -12,3 +12,12 @@ class OnAirHandler(PublicHandler):
 
         # todo format response correctly
         self.response.write(json.dumps([show['show_name'] for show in shows]))
+
+
+class ChannelHandler(PublicHandler):
+    def get(self, country_code, channel_id):
+        timezone = HelperService.get_shows_info_tz_for_country(country_code)
+        shows = ShowsService.retrieve_shows_for_channel(channel_id, timezone)
+
+        # todo format response correctly
+        self.response.write(json.dumps([show['show_name'] for show in shows]))
