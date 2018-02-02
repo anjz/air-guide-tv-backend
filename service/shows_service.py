@@ -9,7 +9,7 @@ class ShowsService:
     @classmethod
     def retrieve_on_air_shows_for_country(cls, timezone):
         import arrow
-        now_datetime = arrow.now(timezone).naive
+        now_datetime = arrow.utcnow().naive
 
         on_air_memcache_key = cls._get_on_air_memcache_key(timezone, now_datetime)
         cached_on_air_shows = memcache.get(on_air_memcache_key)
