@@ -7,6 +7,7 @@ class ShowModel(BaseModel):
     """
     Ndb model holding tv show information
     """
+    scrap_info_key = ndb.KeyProperty(name='sk')
     timezone = ndb.StringProperty(name='tz')
     channel_id = ndb.StringProperty(name='ci')
     show_id = ndb.StringProperty(name='sid')

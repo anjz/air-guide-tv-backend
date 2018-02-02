@@ -24,7 +24,7 @@ class ScrapingService:
 
     def _scrap_and_store_shows(self, date, scrap_info_entity_key):
         logging.info('Scraping date: {}'.format(date.isoformat()))
-        shows = self.__scraper.get_shows_for_date(date, parent=scrap_info_entity_key)
+        shows = self.__scraper.get_shows_for_date(date, scrap_info_key=scrap_info_entity_key)
 
         for batch in self._get_list_in_batches(shows, self.__MAX_BATCH_SIZE):
             ndb.put_multi(batch, use_cache=False)
@@ -35,10 +35,10 @@ class ScrapingService:
         for item_index in range(0, len(full_list), batch_size):
             yield full_list[item_index:min(item_index + batch_size, len(full_list))]
 
-    def _delete_scrap_info(self, scrap_parent_entity_key):
+    def _delete_scrap_info(self, scrap_entity_key):
         logging.info('Deleting old shows information')
-        delete_keys = ShowModel.query(ancestor=scrap_parent_entity_key).fetch(keys_only=True)
-        delete_keys.append(scrap_parent_entity_key)
+        delete_keys = ShowModel.query(ShowModel.scrap_info_key == scrap_entity_key).fetch(keys_only=True)
+        delete_keys.append(scrap_entity_key)
 
         for batch in self._get_list_in_batches(delete_keys, self.__MAX_BATCH_SIZE):
             ndb.delete_multi(batch)

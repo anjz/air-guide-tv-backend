@@ -22,12 +22,12 @@ class ShowsService:
         # queries are required. The intersection of the 2 result sets contains the desired info.
         past_or_current_shows = ShowModel.query(
             ShowModel.start_time <= now_datetime,
-            ancestor=scrap_entity.key
+            ShowModel.scrap_info_key == scrap_entity.key
         ).fetch(keys_only=True)
 
         future_or_current_shows = ShowModel.query(
             ShowModel.end_time >= now_datetime,
-            ancestor=scrap_entity.key
+            ShowModel.scrap_info_key == scrap_entity.key
         ).fetch(keys_only=True)
 
         current_shows_keys = set(past_or_current_shows) & set(future_or_current_shows)
@@ -48,7 +48,11 @@ class ShowsService:
 
         scrap_entity = cls._get_most_recent_scrap_entity(timezone)
 
-        channel_shows = ShowModel.query(ShowModel.channel_id == channel_id, ancestor=scrap_entity.key).fetch()
+        channel_shows = ShowModel.query(
+            ShowModel.channel_id == channel_id,
+            ShowModel.scrap_info_key == scrap_entity.key
+        ).fetch()
+
         channel_shows_dict = [show.to_dict() for show in channel_shows]
 
         memcache.set(memcache_key, channel_shows_dict)

@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb.key import Key
 
 
 class BaseModel(ndb.Model):
@@ -27,5 +28,7 @@ class BaseModel(ndb.Model):
             return dict((BaseModel._coerce(k), BaseModel._coerce(v)) for k, v in value.items())
         elif hasattr(value, '__iter__'):
             return map(BaseModel._coerce, value)
+        elif isinstance(value, Key):
+            return value.id()
         else:
             raise ValueError('cannot encode %r' % value)

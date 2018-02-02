@@ -11,6 +11,16 @@ indexes:
 # your application using appcfg.py.
 
 - kind: ShowModel
+  properties:
+  - name: sk
+  - name: et
+
+- kind: ShowModel
+  properties:
+  - name: sk
+  - name: st
+
+- kind: ShowModel
   ancestor: yes
   properties:
   - name: et

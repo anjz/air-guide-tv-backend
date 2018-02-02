@@ -14,11 +14,11 @@ class ElPaisScraper:
 
     TIME_ZONE = 'Europe/Madrid'
 
-    def get_shows_for_date(self, date, parent=None):
+    def get_shows_for_date(self, date, scrap_info_key):
         """
         A list of tv shows in the given date.
 
-        :param ndb.Key parent: Entity key to be used as parent for the generated show entities
+        :param ndb.Key scrap_info_key: Entity key to be used as parent for the generated show entities
         :param datetime.datetime date: Arrow object for the desired date.
         :return: A list of show models.
         :rtype: list[ShowModel]
@@ -52,7 +52,8 @@ class ElPaisScraper:
 
             for channel in channels_list:
                 for show in channel['programas']:
-                    show_model = ShowModel(parent=parent)
+                    show_model = ShowModel()
+                    show_model.scrap_info_key = scrap_info_key
                     show_model.timezone = self.TIME_ZONE
                     show_model.channel_id = channel['idCanal']
                     # Dates in the json document are Madrid dates.
